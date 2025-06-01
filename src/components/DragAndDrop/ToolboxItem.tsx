@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDrag } from 'react-dnd';
-import { FormField, FieldType } from '../../types';
+import { FieldType } from '../../types';
 import { createNewField } from '../../utils/formUtils';
 
 interface ToolboxItemProps {
@@ -10,18 +10,19 @@ interface ToolboxItemProps {
 }
 
 const ToolboxItem: React.FC<ToolboxItemProps> = ({ type, label, icon }) => {
-  const field = React.useMemo(() => createNewField(type), [type]);
-  
   const [{ isDragging }, drag] = useDrag({
     type: 'TOOLBOX_ITEM',
-    item: { type: 'TOOLBOX_ITEM', field },
+    item: () => ({
+      type: 'TOOLBOX_ITEM',
+      field: createNewField(type), // ✅ create new field instance per drag
+    }),
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });
-  
+
   return (
-    <div 
+    <div
       ref={drag}
       className={`flex items-center p-3 mb-2 border rounded-md bg-[var(--card-bg)] cursor-grab ${
         isDragging ? 'opacity-50' : ''
